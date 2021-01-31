@@ -8,6 +8,7 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 import java.util.List;
 
+//hibernate
 public class Main {
 
     public static void main(String[] args) throws SQLException {
