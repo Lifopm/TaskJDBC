@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Main {
 
+    //Maven JDBC
     public static void main(String[] args) throws SQLException {
         UserService userService = new UserServiceImpl();
 
