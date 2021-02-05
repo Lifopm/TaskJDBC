@@ -18,11 +18,8 @@ public class Main {
 
 
         UserService userService = new UserServiceImpl();
-
-        userService.saveUser("D", "V", (byte)28);
-
-        List<User> user = userService.getAllUsers();
-        System.out.println(user.get(0).getName());
+        //userService.createUsersTable();
+        userService.cleanUsersTable();
         //userService.createUsersTable();
 //
 //        userService.saveUser("Dmitry", "Ivanov", (byte) 15);
