@@ -14,60 +14,70 @@ public class UserDaoJDBCImpl implements UserDao {
         connection = Util.getConnection();
     }
 
-    public void createUsersTable() throws SQLException {
-        DatabaseMetaData dbm = connection.getMetaData();
-        ResultSet tables = dbm.getTables(null, null, "polzovatel", null);
-
-        if (!tables.next()) {
-
-            Statement statement = Util.getStatement();
-            String query = "CREATE TABLE `mydbtest`.`polzovatel` (`id` INT NOT NULL AUTO_INCREMENT,\n" +
+    public void createUsersTable() {
+        try {
+            String query = "CREATE TABLE IF NOT EXISTS `mydbtest`.`polzovatel` (`id` INT NOT NULL AUTO_INCREMENT,\n" +
                     " `name` VARCHAR(45) NULL,\n" +
                     " `lastName` VARCHAR(45) NULL,\n" +
                     " `age` INT(3) NULL,\n" +
                     " PRIMARY KEY (`id`));";
-            statement.execute(query);
+            PreparedStatement preparedStatement = Util.getConnection().prepareStatement(query);
+            preparedStatement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 
-    public void dropUsersTable() throws SQLException {
-        DatabaseMetaData dbm = connection.getMetaData();
-        ResultSet tables = dbm.getTables(null, null, "polzovatel", null);
-
-        if (tables.next()) {
-            Statement statement = Util.getStatement();
-            statement.executeUpdate("DROP TABLE polzovatel");
+    public void dropUsersTable() {
+        try {
+            String query = "DROP TABLE IF EXISTS polzovatel";
+            PreparedStatement preparedStatement = Util.getConnection().prepareStatement(query);
+            preparedStatement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
-
     }
 
-    public void saveUser(String name, String lastName, byte age) throws SQLException {
-        Statement statement = Util.getStatement();
-        statement.execute("INSERT INTO polzovatel(name, lastName, age) VALUES('" + name + "','" + lastName + "','" + age + "')");
-        System.out.println("User с именем – " + name + " добавлен в базу данных");
+    public void saveUser(String name, String lastName, byte age) {
+        try {
+            String query = "INSERT INTO polzovatel(name, lastName, age) VALUES(?,?,?)";
+            PreparedStatement preparedStatement = Util.getConnection().prepareStatement(query);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setByte(3, age);
+            int rows = preparedStatement.executeUpdate();
+            System.out.printf("%d rows added", rows);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
-    public void removeUserById(long id) throws SQLException {
-        Statement statement = Util.getStatement();
-        statement.execute("DELETE FROM polzovatel WHERE id=" + id + "");
-        System.out.println("User удален из базы данных");
+    public void removeUserById(long id) {
+        try {
+            String query = "DELETE FROM polzovatel WHERE id=?";
+            PreparedStatement preparedStatement = Util.getConnection().prepareStatement(query);
+            preparedStatement.setLong(1, id);
+            int rows = preparedStatement.executeUpdate();
+            System.out.printf("%d rows added", rows);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
     public List<User> getAllUsers() {
         List<User> users = new LinkedList<>();
+
         try {
-            Statement statement = Util.getStatement();
-
             String query = "SELECT * FROM polzovatel";
+            PreparedStatement preparedStatement = Util.getConnection().prepareStatement(query);
 
-            ResultSet resultSet = statement.executeQuery(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 String userName = resultSet.getString("name");
-                int userID = resultSet.getInt("id");
                 String userLastName = resultSet.getString("lastName");
-                int userAge = resultSet.getInt("age");
-                User user = new User(userName, userLastName, (byte)userAge);
+                byte userAge = resultSet.getByte("age");
+                User user = new User(userName, userLastName, userAge);
                 users.add(user);
                 System.out.println(user.toString());
             }
@@ -78,8 +88,13 @@ public class UserDaoJDBCImpl implements UserDao {
         return users;
     }
 
-    public void cleanUsersTable() throws SQLException {
-        Statement statement = Util.getStatement();
-        statement.execute("TRUNCATE polzovatel");
+    public void cleanUsersTable() {
+        try {
+            String query = "TRUNCATE polzovatel";
+            PreparedStatement preparedStatement = Util.getConnection().prepareStatement(query);
+            preparedStatement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 }

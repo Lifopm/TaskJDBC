@@ -11,7 +11,7 @@ import java.util.List;
 public class Main {
 
     //Maven JDBC
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         UserService userService = new UserServiceImpl();
 
         userService.createUsersTable();
@@ -22,6 +22,10 @@ public class Main {
         userService.saveUser("Petya", "Petrov", (byte) 15);
 
         List users = userService.getAllUsers();
+
+        for (int i = 0; i < users.size(); i++) {
+            System.out.println("Вот такой пользователь: " + users.get(i));
+        }
 
         userService.cleanUsersTable();
 
